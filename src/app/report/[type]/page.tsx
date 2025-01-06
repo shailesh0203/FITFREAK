@@ -6,6 +6,7 @@ import {AiFillEdit} from 'react-icons/ai'
 import CalorieIntakePopup from '@/components/ReportFormPopup/CalorieIntake/CalorieIntakePopup'
 
 const page = () => {
+    const color='#ffc20e'
     const chartsParams = {
         // margin: { bottom: 20, left: 25, right: 5 },
         height: 300,
@@ -54,23 +55,135 @@ const page = () => {
                 unit: 'kcal'
             },
         ]
-        console.log(temp)
-        setDataS1(temp)
+        let dataForLineChart=temp.map((item:any)=>{
+            let val=JSON.stringify(item.value)
+            return val
+        })
+       
+        let dataForXAxis=temp.map((item:any)=>{
+            let val=(new Date(item.date))
+            return val
+        })
+        
+        setDataS1({
+            data:dataForLineChart,
+            title:'1 Day calorie intake',
+            color:color,
+            xAxis:{
+                data:dataForXAxis,
+                label:String('Last 10 Days'),
+                scaleType:'time'
+            }
+        })
     }
     React.useEffect(()=>{
         getDataForS1()
     },[])
+   const [showCalorieIntakePopup,setShowCalorieIntakePopup] =React.useState<boolean>(false)
   return (
     <div className='reportpage'>
+        <div className='s1'>
+        { dataS1 &&
          <LineChart
-      xAxis={[{ data: [1, 2, 3, 5, 8, 10] }]}
+      xAxis={[{ 
+        id:'Day',
+        data:dataS1.xAxis.data,
+        scaleType:dataS1.xAxis.scaleType,
+        label:dataS1.xAxis.label,
+        valueFormatter:(date:any)=>{
+            return String(date.getDate());
+        }
+       }]}
       series={[
         {
-          data: [2, 5.5, 2, 8.5, 1.5, 5],
+          data:dataS1.data,
+          label:dataS1.title,
+          color:dataS1.color
         },
       ]}
      {...chartsParams}
     />
+}
+</div>
+<div className='s2'>
+        { dataS1 &&
+         <LineChart
+      xAxis={[{ 
+        id:'Day',
+        data:dataS1.xAxis.data,
+        scaleType:dataS1.xAxis.scaleType,
+        label:dataS1.xAxis.label,
+        valueFormatter:(date:any)=>{
+            return String(date.getDate());
+        }
+       }]}
+      series={[
+        {
+          data:dataS1.data,
+          label:dataS1.title,
+          color:dataS1.color
+        },
+      ]}
+     {...chartsParams}
+    />
+}
+</div>
+<div className='s3'>
+        { dataS1 &&
+         <LineChart
+      xAxis={[{ 
+        id:'Day',
+        data:dataS1.xAxis.data,
+        scaleType:dataS1.xAxis.scaleType,
+        label:dataS1.xAxis.label,
+        valueFormatter:(date:any)=>{
+            return String(date.getDate());
+        }
+       }]}
+      series={[
+        {
+          data:dataS1.data,
+          label:dataS1.title,
+          color:dataS1.color
+        },
+      ]}
+     {...chartsParams}
+    />
+}
+</div>
+<div className='s4'>
+        { dataS1 &&
+         <LineChart
+      xAxis={[{ 
+        id:'Day',
+        data:dataS1.xAxis.data,
+        scaleType:dataS1.xAxis.scaleType,
+        label:dataS1.xAxis.label,
+        valueFormatter:(date:any)=>{
+            return String(date.getDate());
+        }
+       }]}
+      series={[
+        {
+          data:dataS1.data,
+          label:dataS1.title,
+          color:dataS1.color
+        },
+      ]}
+     {...chartsParams}
+    />
+}
+</div>
+<button className='editbutton'
+onClick={()=>{
+    setShowCalorieIntakePopup(true)
+}}>
+    <AiFillEdit/>
+</button>
+{
+    showCalorieIntakePopup &&
+    <CalorieIntakePopup/>
+}
     </div>
   )
 }
