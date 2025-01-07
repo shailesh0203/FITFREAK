@@ -182,7 +182,7 @@ onClick={()=>{
 </button>
 {
     showCalorieIntakePopup &&
-    <CalorieIntakePopup/>
+    <CalorieIntakePopup setShowCalorieIntakePopup={setShowCalorieIntakePopup}/>
 }
     </div>
   )
