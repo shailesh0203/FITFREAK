@@ -73,19 +73,7 @@ const HomeBanner1 = () => {
         getData()
     },[])
     
-    function simplifyFraction(numerator: number, denominator: number): [number, number] {
-      function gcd(a: number, b: number): number {
-        if (!Number.isFinite(a) || !Number.isFinite(b)) return 1; // Safe fallback
-        return b === 0 ? a : gcd(b, a % b);
-      }
     
-      if (denominator === 0 || !Number.isFinite(numerator) || !Number.isFinite(denominator)) {
-        return [numerator, 1]; // Avoid division by 0 or invalid numbers
-      }
-    
-      const commonDivisor = gcd(numerator, denominator);
-      return [numerator / commonDivisor, denominator / commonDivisor];
-    }
     
   return (
     <div className='meters'>
@@ -96,11 +84,11 @@ const HomeBanner1 = () => {
                     <div className='card-header'>
                         <div className='card-header-box'>
                             <div className='card-header-box-name'>{item.name}</div>
-                            <div className='card-header-box-value'>{item.value}{item.unit}</div>
+                            <div className='card-header-box-value'>{parseInt(item.value)}{item.unit}</div>
                         </div>
                         <div className='card-header-box'>
                             <div className='card-header-box-name'>Target</div>
-                            <div className='card-header-box-value'>{item.goal}{item.goalUnit}</div>
+                            <div className='card-header-box-value'>{parseInt(item.goal)}{item.goalUnit}</div>
                         </div>
                     </div>
                     <CircularProgress
@@ -112,11 +100,17 @@ const HomeBanner1 = () => {
                         (item.value/item.goal)*100
                     }
                      >
-                       <span className='textincircle'>
-                  {
-                    simplifyFraction(item.value, item.goal)[0] + ' / ' + simplifyFraction(item.value, item.goal)[1]
-                  }
-                </span>
+                       <div className='textincircle'>
+                        <span>{
+                          parseInt(item.value)}</span>
+                          <span className='hrline'></span>
+                          <span>
+                            {
+                              parseInt(item.goal)
+                            }
+                          </span>
+                  
+                </div>
                      </CircularProgress>
                      <button
                onClick={() => {
