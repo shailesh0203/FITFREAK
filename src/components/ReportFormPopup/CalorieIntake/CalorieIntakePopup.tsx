@@ -2,68 +2,83 @@ import React from 'react'
 import '../popup.css'
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
-import DatePicker from "react-horizontal-datepicker";
 import { AiFillDelete, AiOutlineClose } from 'react-icons/ai'
-import { TimePicker } from '@mui/x-date-pickers/TimePicker';
+import { TimeClock } from '@mui/x-date-pickers/TimeClock';
 import dayjs, { Dayjs } from 'dayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { TimeClock } from '@mui/x-date-pickers/TimeClock';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { toast } from 'react-toastify';
+
 
 interface calorieintakepopupprops{
   setShowCalorieIntakePopup:React.Dispatch<React.SetStateAction<boolean>>
 }
 const CalorieIntakePopup:React.FC<calorieintakepopupprops> = ({setShowCalorieIntakePopup}) => {
-  const [value, setValue] = React.useState<Dayjs | null>(dayjs('2022-04-17T15:30'));
+  
   const color = '#ffc20e'
-  const [date,setDate]=React.useState<any>(new Date())
-  const selectedDay = (val: any) => {
-    console.log(val)
-  };
+  const [date,setDate]=React.useState<any>(dayjs(new Date()))
+  const [time,setTime]=React.useState<any>(dayjs(new Date()))
+  const [calorieIntake,setCalorieIntake]=React.useState<any>({
+    item:' ',
+    date:'',
+    quantity:'',
+    quantitytype:'g'
+  })
+  const [items,setItems]=React.useState<any>([])
+  const saveCalorieIntake=async()=>{}
+  const getCalorieIntake=async()=>{}
+  const deleteCalorieIntake=async(item:any)=>{}
+
+  React.useEffect(()=>{
+    getCalorieIntake()
+  },[date])
+
+  const selectedDay=(val:any)=>{
+    setDate(val)
+  }
   return (
     <div className='popupout'>
       <div className='popupbox'>
-     <button className='close'
-     onClick={()=>{
-      setShowCalorieIntakePopup(false)
-     }}
-     >
-      <AiOutlineClose/>
-     </button>
-     <DatePicker getSelectedDay={selectedDay}
-          endDate={100}
-          selectDate={new Date()}
-          labelFormat={"MMMM"}
-          color={color}
-        />
-        <TextField id="outlined-basic" label="Food item name" variant="outlined" color="warning"/>
-        <TextField id="outlined-basic" label="Food item amount (in gms)" variant="outlined" color="warning" />
-        <div className='timebox'>
+        <button className='close'
+        onClick={()=>{
+          setShowCalorieIntakePopup(true)
+        }}
+        >
+          <AiOutlineClose/>
+        </button>
         <LocalizationProvider dateAdapter={AdapterDayjs}>
-        <TimeClock value={value} onChange={(newValue) => setValue(newValue)} />
-          </LocalizationProvider>
-          </div>
-          <Button variant='contained' color='warning'> save</Button>
-          <div className='hrline'></div>
-        <div className='items'>
-          <div className='item'>
-            <h3>Apple</h3>
-            <h3>100 gms</h3>
-            <button> <AiFillDelete /></button>
-          </div>
-          <div className='item'>
-            <h3>Banana</h3>
-            <h3>200 gms</h3>
-            <button> <AiFillDelete /></button>
+  <DatePicker
+    label="select Date"
+    value={date}
+    onChange={(newValue: any) => {
+      selectedDay(newValue);
+    }}
+  />
+</LocalizationProvider>
+<TextField id="outlined-basic" label="Food item name" variant="outlined" color="warning"
+  onChange={(e) => {
+    setCalorieIntake({ ...calorieIntake, item: e.target.value })
+  }}
+/>
 
-          </div>
-          <div className='item'>
-            <h3>Rice</h3>
-            <h3>300 gms</h3>
-            <button> <AiFillDelete /></button>
-            </div>
-        </div>
-     </div>
+<TextField id="outlined-basic" label="Food item amount (in gms)" variant="outlined" color="warning"
+  type="number"
+  onChange={(e) => {
+    setCalorieIntake({ ...calorieIntake, quantity: e.target.value })
+  }}
+/>
+<div className='timebox'>
+  <LocalizationProvider dateAdapter={AdapterDayjs}>
+    <TimeClock value={time} onChange={(newValue) => setTime(newValue)} />
+  </LocalizationProvider>
+</div>
+<Button variant="contained" color="warning"
+  onClick={saveCalorieIntake}
+>
+  Save
+</Button>
+      </div>
       </div>
   )
 }
