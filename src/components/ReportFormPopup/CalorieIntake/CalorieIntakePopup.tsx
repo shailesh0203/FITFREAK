@@ -3,7 +3,7 @@ import '../popup.css'
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
 import { AiFillDelete, AiOutlineClose } from 'react-icons/ai'
-import { TimeClock } from '@mui/x-date-pickers/TimeClock';
+import { TimePicker } from '@mui/x-date-pickers/TimePicker';
 import dayjs, { Dayjs } from 'dayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
@@ -26,8 +26,73 @@ const CalorieIntakePopup:React.FC<calorieintakepopupprops> = ({setShowCalorieInt
     quantitytype:'g'
   })
   const [items,setItems]=React.useState<any>([])
-  const saveCalorieIntake=async()=>{}
-  const getCalorieIntake=async()=>{}
+  const saveCalorieIntake=async()=>{
+    let tempdate = date.format('YYYY-MM-DD')
+    let temptime = time.format('HH:mm:ss')
+    let tempdatetime = tempdate + ' ' + temptime
+    let finaldatetime = new Date(tempdatetime)
+   
+    console.log(finaldatetime+'finaldatetime')
+    fetch(process.env.NEXT_PUBLIC_BACKEND_API + '/calorieintake/addcalorieintake', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        
+      },
+      credentials: 'include',
+      body: JSON.stringify({
+        item: calorieIntake.item,
+        date: finaldatetime,
+        quantity: calorieIntake.quantity,
+        quantitytype: calorieIntake.quantitytype
+      })
+    })
+    .then(res => res.json())
+.then(data => {
+  if (data.ok) {
+    toast.success('Calorie intake added successfully')
+    setCalorieIntake({})
+  }
+  else {
+    toast.error('Error in adding calorie intake')
+  }
+})
+.catch(err => {
+  toast.error('Error in adding calorie intake')
+  console.log(err)
+})
+
+    
+  }
+  const getCalorieIntake=async()=>{
+    setItems([])
+fetch(process.env.NEXT_PUBLIC_BACKEND_API + '/calorieintake/getcalorieintakebydate', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  credentials: 'include',
+  body: JSON.stringify({
+    date: date
+  })
+})
+.then(res => res.json())
+.then(data => {
+  if (data.ok) {
+    console.log(data.data,'calorie intake data from date')
+    setItems(data.data)
+  }
+  else {
+    toast.error('Error in getting calorie intake')
+  }
+})
+.catch(err => {
+  toast.error('Error in getting calorie intake')
+  console.log(err)
+})
+
+
+  }
   const deleteCalorieIntake=async(item:any)=>{}
 
   React.useEffect(()=>{
@@ -70,7 +135,11 @@ const CalorieIntakePopup:React.FC<calorieintakepopupprops> = ({setShowCalorieInt
 />
 <div className='timebox'>
   <LocalizationProvider dateAdapter={AdapterDayjs}>
-    <TimeClock value={time} onChange={(newValue) => setTime(newValue)} />
+    <TimePicker
+    label="Time picker"
+    value={time}
+    onChange={(newValue:any)=>setTime(newValue)}
+    />
   </LocalizationProvider>
 </div>
 <Button variant="contained" color="warning"
@@ -78,6 +147,26 @@ const CalorieIntakePopup:React.FC<calorieintakepopupprops> = ({setShowCalorieInt
 >
   Save
 </Button>
+<div className='hrline'></div>
+<div className='items'>
+  {
+items.map((item: any) => {
+  return (
+    <div className='item'>
+      <h3>{item.item}</h3>
+      <h3>{item.quantity} {item.quantitytype}</h3>
+      <button
+        onClick={() => {
+          deleteCalorieIntake(item)
+        }}
+      >
+        <AiFillDelete />
+      </button>
+    </div>
+  )
+})
+}
+</div>
       </div>
       </div>
   )
