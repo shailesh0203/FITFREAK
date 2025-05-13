@@ -26,44 +26,49 @@ const CalorieIntakePopup:React.FC<calorieintakepopupprops> = ({setShowCalorieInt
     quantitytype:'g'
   })
   const [items,setItems]=React.useState<any>([])
-  const saveCalorieIntake=async()=>{
-    let tempdate = date.format('YYYY-MM-DD')
-    let temptime = time.format('HH:mm:ss')
-    let tempdatetime = tempdate + ' ' + temptime
-    let finaldatetime = new Date(tempdatetime)
-   
-    console.log(finaldatetime+'finaldatetime')
+  const saveCalorieIntake = async () => {
+    let tempdate = date.format('YYYY-MM-DD');
+    let temptime = time.format('HH:mm:ss');
+    let tempdatetime = `${tempdate}T${temptime}`;
+    let finaldatetime = new Date(tempdatetime);
+
+    console.log('Sending date:', finaldatetime.toISOString());
+
     fetch(process.env.NEXT_PUBLIC_BACKEND_API + '/calorieintake/addcalorieintake', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        
       },
       credentials: 'include',
       body: JSON.stringify({
         item: calorieIntake.item,
         date: finaldatetime,
         quantity: calorieIntake.quantity,
-        quantitytype: calorieIntake.quantitytype
-      })
+        quantitytype: calorieIntake.quantitytype,
+      }),
     })
-    .then(res => res.json())
-.then(data => {
-  if (data.ok) {
-    toast.success('Calorie intake added successfully')
-    setCalorieIntake({})
-  }
-  else {
-    toast.error('Error in adding calorie intake')
-  }
-})
-.catch(err => {
-  toast.error('Error in adding calorie intake')
-  console.log(err)
-})
-
-    
-  }
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.ok) {
+          toast.success('Calorie intake added successfully');
+          setCalorieIntake({
+            item: '',
+            date: '',
+            quantity: '',
+            quantitytype: 'g',
+          });
+          setDate(dayjs(new Date()));
+          setTime(dayjs(new Date()));
+          getCalorieIntake(); // Keep this to ensure the list is up-to-date
+        } else {
+          toast.error('Error in adding calorie intake');
+        }
+      })
+      .catch((err) => {
+        toast.error('Error in adding calorie intake');
+        console.log(err);
+      });
+  };
   const getCalorieIntake=async()=>{
     setItems([])
 fetch(process.env.NEXT_PUBLIC_BACKEND_API + '/calorieintake/getcalorieintakebydate', {
@@ -93,7 +98,35 @@ fetch(process.env.NEXT_PUBLIC_BACKEND_API + '/calorieintake/getcalorieintakebyda
 
 
   }
-  const deleteCalorieIntake=async(item:any)=>{}
+  const deleteCalorieIntake=async(item:any)=>{
+    fetch(process.env.NEXT_PUBLIC_BACKEND_API + '/calorieintake/deletecalorieintake', {
+  method: 'DELETE',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  credentials: 'include',
+  body: JSON.stringify({
+    item: item.item,
+    date: item.date
+  })
+})
+.then(res => res.json())
+.then(data => {
+  if (data.ok) {
+    toast.success('Calorie intake item deleted successfully')
+    getCalorieIntake()
+  }
+  else {
+    toast.error('Error in deleting calorie intake')
+  }
+})
+.catch(err => {
+  toast.error('Error in deleting calorie intake')
+  console.log(err)
+})
+
+
+  }
 
   React.useEffect(()=>{
     getCalorieIntake()
@@ -107,7 +140,7 @@ fetch(process.env.NEXT_PUBLIC_BACKEND_API + '/calorieintake/getcalorieintakebyda
       <div className='popupbox'>
         <button className='close'
         onClick={()=>{
-          setShowCalorieIntakePopup(true)
+          setShowCalorieIntakePopup(false)
         }}
         >
           <AiOutlineClose/>
@@ -150,23 +183,24 @@ fetch(process.env.NEXT_PUBLIC_BACKEND_API + '/calorieintake/getcalorieintakebyda
 <div className='hrline'></div>
 <div className='items'>
   {
-items.map((item: any) => {
-  return (
-    <div className='item'>
-      <h3>{item.item}</h3>
-      <h3>{item.quantity} {item.quantitytype}</h3>
-      <button
-        onClick={() => {
-          deleteCalorieIntake(item)
-        }}
-      >
-        <AiFillDelete />
-      </button>
-    </div>
-  )
-})
-}
+    items.map((item: any, index: number) => {
+      return (
+        <div className='item' key={index}> {/* Using index as key (not recommended if order changes) */}
+          <h3>{item.item}</h3>
+          <h3>{item.quantity} {item.quantitytype}</h3>
+          <button
+            onClick={() => {
+              deleteCalorieIntake(item)
+            }}
+          >
+            <AiFillDelete />
+          </button>
+        </div>
+      )
+    })
+  }
 </div>
+
       </div>
       </div>
   )
