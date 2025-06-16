@@ -28,7 +28,7 @@ const page = () => {
 })
 .then(res=>res.json())
 .then(data => {
-    if (data.ok) {
+    if (data.ok ) {
         let temp = data.data.map((item: any) => {
             return {
                 date: item.date,
@@ -119,7 +119,7 @@ const page = () => {
    const [showCalorieIntakePopup,setShowCalorieIntakePopup] =React.useState<boolean>(false)
   return (
     <div className='reportpage'>
-    {   dataS1?.length>0 &&
+ 
         <div className='s1'>
         { dataS1 &&
          <LineChart
@@ -144,7 +144,7 @@ const page = () => {
 }
 
 </div>
-}
+
 
 <button className='editbutton'
 onClick={()=>{
